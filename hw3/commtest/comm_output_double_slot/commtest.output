@@ -1,0 +1,24 @@
+1000_TEST
+I am node 1 of 2
+Sending to 1 and receiving from 1
+I am node 2 of 2
+Sending to 0 and receiving from 0
+run time: 0.003872
+10000_TEST
+I am node 1 of 2
+Sending to 1 and receiving from 1
+I am node 2 of 2
+Sending to 0 and receiving from 0
+run time: 0.037951
+100000_TEST
+I am node 1 of 2
+Sending to 1 and receiving from 1
+I am node 2 of 2
+Sending to 0 and receiving from 0
+run time: 0.374388
+1000000_TEST
+I am node 1 of 2
+Sending to 1 and receiving from 1
+I am node 2 of 2
+Sending to 0 and receiving from 0
+run time: 3.709784

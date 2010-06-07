@@ -1,0 +1,427 @@
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Parallel versus Sequential Matrix Multiplication
+\end_layout
+
+\begin_layout Author
+james francis toy iv
+\end_layout
+
+\begin_layout Date
+2010-06-05
+\end_layout
+
+\begin_layout Section
+Sequential analysis
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing double
+The graphs associated with the sequential analysis compare part a,b,c,d
+ with their optimized twins.
+ Noticeable increases typically required 
+\begin_inset Formula $n\geq500$
+\end_inset
+
+ and were in the range of a tenth of a second to about six seconds.
+ A tenth of a second increase was found from comparing part a to b where
+ 
+\begin_inset Formula $n\geq500$
+\end_inset
+
+ and the extremely noticable six second difference was the result of comparing
+ a to d where a is the generic non optimized version and d has transpose
+ with partial loop unrolling while summing elements in the dot-product.
+ I was thoroughly impressed with part d, originally my thinking was that
+ most of the optimizations done by hand wouldn't bear much of a difference
+ and real speed-up would require complex optimizations like loop fusion
+ and loop nest optimizations (what i based my implementation on often used
+ for this exact example -- BLAST among others use this concept heavily).
+ This turned out to be untrue; by the time the optimizations had all been
+ coupled by part d we were noticing a 6 second speedup! I would also go
+ so far as to say that while the other optimization prior to d did make
+ a difference it is not even comperable to what the loop nest optimization
+ brought to the table.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing double
+Compilers are smart.
+ In this case enabling O2 means GCC performs nearly all supported optimizations
+ that do not involve a space-speed tradeoff.
+ The compiler does not perform loop unrolling or function inlining when
+ you specify O2.
+ I personally used O3 because I knew O3 turns on all optimizations specified
+ by O2 and also turns on the -finline-functions, -funswitch-loops, -fpredictive-
+commoning, -fgcse-after-reload and -ftree-vectorize options.
+ A complete list if these can be found here: 
+\family typewriter
+http://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+\family default
+.
+ The most important directive which is not added into any of the generic
+ -Ox optimization schemes is -funroll-loops and or -funroll-all-loops.
+ These are extremely helpful and show why d is so much faster than all the
+ other implementations because it unrolls loops whose number of iterations
+ can be determined at compile time or upon entry to the loop.
+ This inherent property of matrix multiplication also has a lot to do with
+ why this problem is so easily paralellizable.
+\end_layout
+
+\begin_layout Section
+Parallel Analysis
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing double
+The most important concept of the parallel implementation is the fact that
+ the 'i loop' in a matrix-matrix multiplication has no dependencies at all.
+ This means that a matrix matrix multiplication can safely be parallelized.
+ I found the checkerboard decomposition (similar to the first project) to
+ be the most effective way of parallizing when using the loop nest optimization
+ that made the part 
+\begin_inset Quotes eld
+\end_inset
+
+d
+\begin_inset Quotes erd
+\end_inset
+
+ sequential program so fast.
+ This proved useful for very large matricies (
+\begin_inset Formula $n\geq2400$
+\end_inset
+
+ or so) since each thread (associated with a processor) is then responsible
+ for a sub-matrix of a more manageable size.
+ Additionally in the parallel implementation I represented the matricies
+ with a single pointer and used math to sort out the creation, access, ownership
+, amongst other operations that were required.
+ Another notable implementation detail is that MPI OpenMP hybrid proved
+ doable since the nature of the problem allowed both HPC utilities to interact
+ well with one another.
+ Making the submeshes smaller was useful up to a point as well.
+ We notice from the results that breaking the matrix up past 16 submeshes
+ proved detrimental for reasonable problem sizes of 
+\begin_inset Formula $n\approx4800$
+\end_inset
+
+ of course increasing the problem size means that more submeshes will be
+ useful up to a new limit; however, this analysis aims to show trends that
+ can be extrapolated to larger problem sizes.
+ 
+\end_layout
+
+\begin_layout Standard
+Speedup is represented as follows:
+\begin_inset Formula \[
+\psi(n,p)=\frac{Sequential-execution-time}{Parallel-execution-time}\]
+
+\end_inset
+
+formally we will compare three sets of tests: 
+\end_layout
+
+\begin_layout Enumerate
+best parallel execution times vs.
+ best sequential execution times
+\end_layout
+
+\begin_layout Enumerate
+best parallel execution times vs.
+ original sequential execution times
+\end_layout
+
+\begin_layout Enumerate
+best sequential execution times vs.
+ original sequential times
+\end_layout
+
+\begin_layout Standard
+(
+\series bold
+\bar under
+NOTE
+\series default
+\bar default
+: all times are represented in seconds)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+\bar under
+----- best parallel vs.
+ best sequential -----
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\psi(1200,16)=\frac{0.250000}{0.413125}=0.605143722\]
+
+\end_inset
+
+the best parallel program runs slower than the best sequential program at
+ 
+\begin_inset Formula $n=1200$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\psi(2400,16)=\frac{6.630000}{2.643750}=2.50780142\]
+
+\end_inset
+
+at 
+\begin_inset Formula $n=2400$
+\end_inset
+
+ the best parallel program is approximately 
+\begin_inset Formula $2\frac{1}{2}$
+\end_inset
+
+ as fast as the best sequential program
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\psi(3600,16)=\frac{29.450000}{8.577500}=3.43340134\]
+
+\end_inset
+
+at 
+\begin_inset Formula $n=3600$
+\end_inset
+
+ the best parallel program is approximately 
+\begin_inset Formula $3\frac{1}{2}$
+\end_inset
+
+ times as fast as the best sequential program
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+\bar under
+----- best parallel vs.
+ original sequential -----
+\series default
+\bar default
+
+\begin_inset Formula \[
+\psi(1200,16)=\frac{17.960000}{0.413125}=43.473525\]
+
+\end_inset
+
+the best parallel program runs approximately 
+\begin_inset Formula $43\frac{1}{2}$
+\end_inset
+
+ times as fast as the original sequential program at 
+\begin_inset Formula $n=1200$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\psi(2400,16)=\frac{173.630000}{2.643750}=65.6756501\]
+
+\end_inset
+
+at 
+\begin_inset Formula $n=2400$
+\end_inset
+
+ the best parallel program is approximately 
+\begin_inset Formula $65\frac{2}{3}$
+\end_inset
+
+ times as fast as the original sequential program
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\psi(3600,16)=\frac{651.800000}{8.577500}=75.9895074\]
+
+\end_inset
+
+at 
+\begin_inset Formula $n=3600$
+\end_inset
+
+ the best parallel program is approximately 
+\begin_inset Formula $76$
+\end_inset
+
+ times as fast as the original sequential program
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+\bar under
+----- best sequential vs.
+ original sequential -----
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\psi(1200,1)=\frac{17.960000}{0.250000}=71.84\]
+
+\end_inset
+
+the best sequential program runs approximately 
+\begin_inset Formula $72$
+\end_inset
+
+ times as fast as the original sequential program at 
+\begin_inset Formula $n=1200$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\psi(2400,1)=\frac{173.630000}{6.630000}=26.188537\]
+
+\end_inset
+
+at 
+\begin_inset Formula $n=2400$
+\end_inset
+
+ the best sequential program is approximately 
+\begin_inset Formula $26$
+\end_inset
+
+ times as fast as the best sequential program
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing double
+\begin_inset Formula \[
+\psi(3600,1)=\frac{651.800000}{29.450000}=22.1324278\]
+
+\end_inset
+
+at 
+\begin_inset Formula $n=3600$
+\end_inset
+
+ the sequential program is approximately 
+\begin_inset Formula $22$
+\end_inset
+
+ as fast as the best sequential program
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+\bar under
+----- end speedup analysis -----
+\begin_inset Newline newline
+\end_inset
+
+
+\series default
+\bar default
+
+\begin_inset Newline newline
+\end_inset
+
+The above analysis shows several important things; however, the real take
+ home messages are that compilation optimizations are not to be taken lightly,
+ and that the parallel version in comparison to the best sequential version
+ shows a steady increase in speedup showing that it scales well.
+ Another interesting comparison is the best sequential versus the orignal
+ sequential, the compilation optimizations make the speedup in smaller numbers
+ extremely pronounced; however, when we increase the problem size the speedup
+ begins to decrease over time.
+ This shows that while the compiler optimizations are not to be taken lightly,
+ there is a point where the problem size grows to an apex requiring a parallel
+ implementation of the program.
+ In the largest problem size example for the best sequential vs.
+ the original sequential program it's 10 minutes wait vs.
+ a half a minute for the multiplication.
+ This problem, as said above, scales extremely well since there is no dependenci
+es at the highest point in the loops (i.e.
+ the 'i-loop'), which means it can be safely parallelized.
+ The analysis speaks for itself highly favoring a sub-matrix decomposition
+ with single threads being responsible for a submesh.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+EOF
+\end_layout
+
+\end_body
+\end_document

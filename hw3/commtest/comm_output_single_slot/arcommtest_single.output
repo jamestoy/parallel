@@ -1,0 +1,24 @@
+10_EL_100000_ITER_TEST
+I am node 2 of 2
+I am node 1 of 2
+Sending to 1 and receiving from 1
+Sending to 0 and receiving from 0
+run time: 128.914597
+100_EL_100000_ITER_TEST
+I am node 1 of 2
+I am node 2 of 2
+Sending to 0 and receiving from 0
+Sending to 1 and receiving from 1
+run time: 142.254568
+1000_EL_100000_ITER_TEST
+I am node 1 of 2
+I am node 2 of 2
+Sending to 1 and receiving from 1
+Sending to 0 and receiving from 0
+run time: 250.429280
+10000_EL_100000_ITER_TEST
+I am node 1 of 2
+Sending to 1 and receiving from 1
+I am node 2 of 2
+Sending to 0 and receiving from 0
+run time: 896.974890

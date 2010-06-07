@@ -1,0 +1,37 @@
+node name: compute-0-2.local
+node 2 of 4
+Sending to 3 and receiving from 1
+node name: compute-0-1.local
+node 0 of 4
+Sending to 1 and receiving from 3
+Node 0 received 790
+Node 0 received 794
+Node 0 received 798
+Node 0 received 802
+Node 0 received 806
+node name: compute-0-1.local
+node 1 of 4
+Sending to 2 and receiving from 0
+Node 1 received 791
+Node 1 received 795
+Node 1 received 799
+Node 1 received 803
+Node 1 received 807
+node compute-0-1.local is all finished
+Node 2 received 792
+Node 2 received 796
+Node 2 received 800
+Node 2 received 804
+Node 2 received 808
+node compute-0-2.local is all finished
+node name: compute-0-2.local
+node 3 of 4
+Sending to 0 and receiving from 2
+Node 3 received 793
+Node 3 received 797
+Node 3 received 801
+Node 3 received 805
+Node 3 received 809
+node compute-0-2.local is all finished
+Node 0 received 810
+node compute-0-1.local is all finished

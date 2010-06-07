@@ -1,0 +1,17 @@
+/**
+ * Algorithm: A and C are partitioned in 1D row blocks, B is partitioned in 
+ * 1D column blocks. 
+ *
+ * The main multiplication involves bnum iterations, 
+ * in iteration i, the ith sub-matrix column of B is broadcast to everybody 
+ * then everybody uses this column and its own portion of A to update the ith 
+ * column of its own portion of C.
+ *
+ * To compile:
+ *
+ * Comments: I've put lots of effort to make the code as easy to read as 
+ * possible. So many opportunities for optimiaztions are possible, e.g.
+ * all the dynmic checking of ownership can be eliminated, and even the
+ * memcpy(...) can be removed.
+ *
+ */

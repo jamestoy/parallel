@@ -1,0 +1,4 @@
+#compute hosts each have two cpus; hosts are named compute-0-[0..31]
+compute-0-1 slots=1
+compute-0-2 slots=1
+#compute-0-3 slots=2

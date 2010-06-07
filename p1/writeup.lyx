@@ -1,0 +1,177 @@
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+steady-state temperature distribution
+\end_layout
+
+\begin_layout Author
+james toy
+\end_layout
+
+\begin_layout Date
+2010-06-02
+\end_layout
+
+\begin_layout Standard
+The purpose of this project was to analyze the performance of various 2D
+ steady-state temperature distribution implementations.
+ We accomplished this via the jacobi method and finite differences.
+ The program was written sequentially, in parallel with row-wise domain
+ decomposition, and finally with a checkerboard domain decomposition.
+ Upon analysis we understand that with simpler and smaller simulations the
+ sequential program has an advantage because it is capable of 
+\begin_inset Quotes eld
+\end_inset
+
+knowing
+\begin_inset Quotes erd
+\end_inset
+
+ everything about domain of the program.
+ This also gives us a better ability for utilizing caching and locality
+ of reference.
+ As a simple example we note an array of size 
+\begin_inset Formula $100x100$
+\end_inset
+
+ at 
+\begin_inset Formula $\varepsilon=0.01$
+\end_inset
+
+ the sequential returns a time of: 0.66 seconds.
+ This is an order of magnitude faster than the same computation on four
+ processors.
+ Interestingly enough though when done on two processors we see a time of
+ 0.295 which means that MPI is running the code on one machine that has two
+ cores (which will take advantage of no inter-node communication).
+ This data is present in the graphs and shows that there is a performance
+ increase when running the program with MPI on one machine with multiple
+ cores.
+\end_layout
+
+\begin_layout Standard
+Also when comparing the parallel versions, it is very apparent that they
+ checkerboard mesh is highly scalable while the row-wise decomposition is
+ not.
+ This is because when computing the isoefficiency function for the algorithm
+ based on a row-wise domain decomposition it turns out to be:
+\begin_inset Formula \[
+n\geq Cp\]
+
+\end_inset
+
+with a scalability function of:
+\begin_inset Formula \[
+\frac{M(Cp)}{p}=C^{2}p\]
+
+\end_inset
+
+this shows that the row-wise block decomposition is not very scalable.
+ However, with the checkerboard domain decomposition each of the p processes
+ are responsible for a smaller mesh that is 
+\begin_inset Formula $\frac{n}{\sqrt{p}}*\frac{n}{\sqrt{p}}$
+\end_inset
+
+.
+ Computing the isoefficiency function shows:
+\begin_inset Formula \[
+N^{2}\geq C\sqrt{p}\]
+
+\end_inset
+
+with a scalability function of:
+\begin_inset Formula \[
+\frac{M(C\sqrt{p}}{p}=C^{2}\]
+
+\end_inset
+
+ this is much more scalable and what we are looking for when we plan on
+ computing values 
+\begin_inset Formula $n\geq10,000$
+\end_inset
+
+ with 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+
+\begin_inset Formula $\varepsilon=0.01$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Looking at the data in the charts, it doesn't appear that we are getting
+ that much of a speedup until we get to the problem size being 
+\begin_inset Formula $n\geq1000$
+\end_inset
+
+.
+ The most drastic difference is between the sequential (30.93) and the 16
+ processor checkerboard domain decomposition (17.1838).
+ This is healthy speed-up! Also note that the row-wise was very close behind
+ on 16 processors with 18.1624.
+ It would appear that once we reach values of 
+\begin_inset Formula $n\geq10000$
+\end_inset
+
+ we will see significant speed-up; even in comparison to the row-wise parallel
+ algorithm since the scalability function is so much better on the checkerboard
+ decomposition.
+\end_layout
+
+\begin_layout Standard
+NOTE: only problems 1,2,3 were completed for this project, I ran out of
+ time to do 4.
+ And yes, as per your last comments the column change i made to implement
+ column-wise domain decomposition is basically row-wise decomposition.
+\end_layout
+
+\end_body
+\end_document
